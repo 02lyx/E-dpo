@@ -1,0 +1,26 @@
+choose_type: max_min
+train_dir: /home/swb9572/iterative-dpo/data/filtered_dataset.json
+eval_dir: /home/swb9572/iterative-dpo/data/filtered_dataset.json
+output_dir: ./pipeline_test/test/
+model_name_or_path: "ZhangShenao/baseline-gemma-2-2b-it-sft"
+ref_model: "ZhangShenao/baseline-gemma-2-2b-it-sft"
+# model_name_or_path: "RLHFlow/LLaMA3-SFT"
+# ref_model: "RLHFlow/LLaMA3-SFT"
+bf16: true
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 16
+label_smoothing: 0.1
+report_to: wandb
+eval_steps: 888888
+num_train_epochs: 2
+logging_steps: 2
+gradient_checkpointing: true
+do_train: true
+do_eval: true
+loss_type: sigmoid
+lr_scheduler_type: cosine
+eval_strategy: steps
+max_length: 512
+max_prompt_length: 1024
+learning_rate: 5.0e-7
