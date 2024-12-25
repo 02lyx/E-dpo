@@ -1,6 +1,4 @@
-conda init
 conda env create -f gen-eval.yaml
-conda init
 eval "$(conda shell.bash hook)"
 
 conda create -n anno-train python=3.10.9 --yes
