@@ -21,4 +21,5 @@ pip install numpy==1.26.4
 pip install antlr4-python3-runtime
 pip install distro
 pip install deepspeed==0.15.4
+pip install peft==0.13.2
 cd ..
