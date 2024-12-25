@@ -23,3 +23,4 @@ pip install distro
 pip install deepspeed==0.15.4
 pip install peft==0.13.2
 cd ..
+conda env create -f environment.yaml
