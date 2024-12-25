@@ -22,3 +22,5 @@ pip install deepspeed==0.15.4
 pip install peft==0.13.2
 cd ..
 conda env create -f environment.yaml
+conda activate yy
+pip inistall flash-attn==2.6.3
