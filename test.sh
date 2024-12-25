@@ -3,10 +3,6 @@ source ~/.bashrc
 # Initialize Conda environment
 eval "$(conda shell.bash hook)"
 
-conda activate anno-train
-export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
-huggingface-cli login  --token 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
-
 # Base paths and settings
 initial_model="google/gemma-2-2b-it"
 base_path="./e_dpo_Gemma-2-2b-it"
@@ -108,5 +104,3 @@ do
 
     run_iteration $iteration_name $model_path $jsonl_input $json_output $model_output
 done
-
-huggingface-cli upload Yuanxin-Liu/Gemma-2-2b-it-e-dpo Gemma-2-2b-it_iter3 --token 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
