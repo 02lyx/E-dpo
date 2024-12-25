@@ -23,4 +23,4 @@ pip install peft==0.13.2
 cd ..
 conda env create -f environment.yaml
 conda activate yy
-pip inistall flash-attn==2.6.3
+pip install flash-attn==2.6.3
