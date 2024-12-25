@@ -4,8 +4,8 @@ source ~/.bashrc
 eval "$(conda shell.bash hook)"
 
 # Base paths and settings
-initial_model="google/gemma-2-2b-it"
-base_path="./e_dpo_Gemma-2-2b-it"
+initial_model="google/gemma-2-9b-it"
+base_path="./e_dpo_Gemma-2-9b-it"
 mkdir $base_path
 iteration_prefix="Train"
 task_pre="math"
@@ -81,7 +81,7 @@ EOT
 # Main loop for iterations
 for i in {1..3}
 do
-    iteration_name="Gemma-2-2b-it_iter${i}"
+    iteration_name="Gemma-2-9b-it_iter${i}"
     jsonl_input="RLHF4MATH/prompt_iter${i}"
     json_output="${base_path}/${iteration_prefix}${i}_${iteration_name}"
     model_output="${base_path}/${iteration_prefix}${i}_${iteration_name}_reward.json"
@@ -98,7 +98,7 @@ do
         model_path=$initial_model
     else
         previous_iteration=$((i-1))
-        model_path="./Gemma-2-2b-it_iter${previous_iteration}"
+        model_path="./Gemma-2-9b-it_iter${previous_iteration}"
     fi
 
     run_iteration $iteration_name $model_path $jsonl_input $json_output $model_output
