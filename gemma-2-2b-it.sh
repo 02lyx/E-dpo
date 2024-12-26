@@ -4,7 +4,7 @@ source ~/.bashrc
 eval "$(conda shell.bash hook)"
 
 # Base paths and settings
-initial_model="google/gemma-2-2b-it"
+initial_model="ZhangShenao/baseline-gemma-2-2b-it-sft"
 base_path="./e_dpo_Gemma-2-2b-it"
 mkdir $base_path
 iteration_prefix="Train"
@@ -18,11 +18,12 @@ run_iteration() {
     local jsonl_input=$3
     local json_output=$4
     local model_output=$5
-    my_world_size=8
-
-    conda activate yy
-    accelerate launch --num_processes ${my_world_size} xiaojun_E_step_ent_PPO_dp.py --model_name ${model_path} --deepspeed deepspeed_configs/deepspeed_2.json --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
-    wait
+    my_world_size=4
+    if [ "$i" -ne 1 ]; then
+        conda activate yy
+        accelerate launch --num_processes ${my_world_size} xiaojun_E_step_ent_PPO_dp.py --model_name ${model_path} --deepspeed deepspeed_configs/deepspeed_2.json --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
+        wait
+    fi
     conda activate gen-eval
     #bash generation/register_server.sh $model_path
     #sleep 140
@@ -32,14 +33,14 @@ run_iteration() {
     infer_model="${e_model_dir}/final_checkpoint"
     prompt_dir=$3
     output_dir=$4
-    CUDA_VISIBLE_DEVICES=0 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 0 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=1 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 1 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=2 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 2 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=3 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 3 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=4 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 4 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=5 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 5 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=6 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 6 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=7 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 7 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=0 python ./generation/gen_hf.py --model_p_name_or_path ${model_path} --model_q_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 0 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=1 python ./generation/gen_hf.py --model_p_name_or_path ${model_path} --model_q_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 1 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=2 python ./generation/gen_hf.py --model_p_name_or_path ${model_path} --model_q_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 2 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=3 python ./generation/gen_hf.py --model_p_name_or_path ${model_path} --model_q_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 3 --my_world_size ${my_world_size} &
+    # CUDA_VISIBLE_DEVICES=4 python ./generation/gen_hf2.py --model_base ${model_path} --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 4 --my_world_size ${my_world_size} &
+    # CUDA_VISIBLE_DEVICES=5 python ./generation/gen_hf2.py --model_base ${model_path} --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 5 --my_world_size ${my_world_size} &
+    # CUDA_VISIBLE_DEVICES=6 python ./generation/gen_hf2.py --model_base ${model_path} --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 6 --my_world_size ${my_world_size} &
+    # CUDA_VISIBLE_DEVICES=7 python ./generation/gen_hf2.py --model_base ${model_path} --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 7 --my_world_size ${my_world_size} &
     wait
     python ./generation/merge_data.py --base_path ${output_dir} --output_dir "${output_dir}_data.json" --num_datasets $my_world_size
 
@@ -87,11 +88,11 @@ do
     model_output="${base_path}/${iteration_prefix}${i}_${iteration_name}_reward.json"
     e_model_dir="${base_path}/e-model-iter-$i"
     if [ "$i" -eq 1 ]; then
-        split="[:33%]"
+        split="[:5%]"
     elif [ "$i" -eq 2 ]; then
-        split="[33%:66%]"
+        split="[5%:10%]"
     else
-        split="[66%:100%]"
+        split="[10%:15%]"
     fi
     # Determine the model path: first iteration uses the initial model, subsequent iterations use the previous iteration's model
     if [ $i -eq 1 ]; then
