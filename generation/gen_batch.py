@@ -11,7 +11,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, HfArgumentParser
 from vllm import LLM, SamplingParams
 from tqdm import tqdm
 from parser import extract_answer, strip_string  # Ensure these are correctly implemented
-
+import gc
 
 @dataclass
 class ScriptArguments:
@@ -85,7 +85,6 @@ def main(script_args):
 
     # Load Tokenizers
     tokenizer_q = AutoTokenizer.from_pretrained(script_args.model_q_name_or_path)
-    tokenizer_p = AutoTokenizer.from_pretrained(script_args.model_p_name_or_path)
 
     # Load Model Q for generation
     llm_q = LLM(
@@ -93,14 +92,6 @@ def main(script_args):
         tokenizer=script_args.model_q_name_or_path,
         dtype="bfloat16",
         max_model_len=script_args.max_input_length,
-        load_format="auto",
-        seed=seed,
-    )
-
-    llm_p = LLM(
-        model=script_args.model_p_name_or_path,
-        tokenizer=script_args.model_p_name_or_path,
-        dtype="bfloat16",
         load_format="auto",
         seed=seed,
     )
@@ -172,11 +163,24 @@ def main(script_args):
     # Generate K responses using Model Q
     print("Generating responses with Model Q...")
     outputs_q = llm_q.generate(prompts, sampling_params=sampling_params_q, use_tqdm=True)
-    tokenizer_p.pad_token = tokenizer_p.eos_token
 
     gathered_data = []
 
     print("Generating reference answers with Model P...")
+
+    del llm_q
+    gc.collect()
+    torch.cuda.empty_cache()
+    # tokenizer_p = AutoTokenizer.from_pretrained(script_args.model_p_name_or_path)
+    # tokenizer_p.pad_token = tokenizer_p.eos_token
+    llm_p = LLM(
+        model=script_args.model_p_name_or_path,
+        tokenizer=script_args.model_p_name_or_path,
+        dtype="bfloat16",
+        load_format="auto",
+        seed=seed,
+    )
+
     for i in tqdm(range(len(ds)), desc="Generating reference answers"):
         prompt = ds[i]["prompt"]
         question = ds[i]["question"]
@@ -189,7 +193,8 @@ def main(script_args):
             prompts_p.append(prompt_p)
         
         outputs_p = llm_p.generate(prompts_p, sampling_params=sampling_params_p)
-        new_response = [out.text for out in outputs_p.outputs]
+        # print(outputs_p)
+        new_response = [outputs_p[i].prompt + outputs_p[i].outputs[0].text for i in range(len(prompts_p))]
             # new_prompt_toks = tokenizer_p(prompt_p, return_tensors='pt', truncation=True, padding=True)
 
             # with torch.no_grad():

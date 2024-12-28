@@ -4,13 +4,12 @@ source ~/.bashrc
 eval "$(conda shell.bash hook)"
 
 # Base paths and settings
-initial_model="google/gemma-2-9b-it"
+initial_model="ZhangShenao/baseline-gemma-2-9b-it-sft"
 base_path="./e_dpo_Gemma-2-9b-it"
 mkdir $base_path
 iteration_prefix="Train"
 task_pre="math"
 task_suf="metamath"
-
 # Function to run a set of operations for a model iteration
 run_iteration() {
     local iteration=$1
@@ -21,7 +20,7 @@ run_iteration() {
     my_world_size=8
 
     conda activate yy
-    accelerate launch --num_processes ${my_world_size} xiaojun_E_step_ent_PPO_dp.py --model_name ${model_path} --deepspeed deepspeed_configs/deepspeed_2.json --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
+    accelerate launch --num_processes ${my_world_size} xiaojun_E_step_ent_PPO_dp.py --model_name ${model_path} --critic_model_name ${model_path} --deepspeed deepspeed_configs/deepspeed_2.json --per_device_train_batch_size 2 --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
     wait
     conda activate gen-eval
     #bash generation/register_server.sh $model_path
@@ -68,9 +67,9 @@ max_length: 2048
 max_prompt_length: 1000
 eval_strategy: steps
 bf16: true
-per_device_train_batch_size: 2
+per_device_train_batch_size: 1
 per_device_eval_batch_size: 1
-gradient_accumulation_steps: 4
+gradient_accumulation_steps: 2
 label_smoothing: 0.1
 EOT
 
@@ -87,11 +86,11 @@ do
     model_output="${base_path}/${iteration_prefix}${i}_${iteration_name}_reward.json"
     e_model_dir="${base_path}/e-model-iter-$i"
     if [ "$i" -eq 1 ]; then
-        split="[:33%]"
+        split="[:5%]"
     elif [ "$i" -eq 2 ]; then
-        split="[33%:66%]"
+        split="[5%:10%]"
     else
-        split="[66%:100%]"
+        split="[15%:20%]"
     fi
     # Determine the model path: first iteration uses the initial model, subsequent iterations use the previous iteration's model
     if [ $i -eq 1 ]; then

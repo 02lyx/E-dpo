@@ -1,5 +1,9 @@
 Gemma-2-2b-it_iter1/
 e_dpo_Gemma-2-2b-it/
+e_dpo_Gemma-2-9b-it/
 wandb/
 __pycache__/
 *.pyc
+Gemma-2-2b-it_iter2/
+Gemma-2-2b-it_iter3/
+Logs/

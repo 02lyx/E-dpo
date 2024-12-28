@@ -1,5 +1,5 @@
-run_name: Gemma-2-2b-it_iter1
-output_dir: Gemma-2-2b-it_iter1
+run_name: Test_Gemma-2-2b-it_iter1
+output_dir: Test_Gemma-2-2b-it_iter1
 model_name_or_path: ZhangShenao/baseline-gemma-2-2b-it-sft
 ref_model: ZhangShenao/baseline-gemma-2-2b-it-sft
 learning_rate: 5.0e-7
@@ -10,15 +10,15 @@ do_train: true
 do_eval: true
 eval_steps: 10000
 choose_type: max_min
-train_dir: ./e_dpo_Gemma-2-2b-it/Train1_Gemma-2-2b-it_iter1_reward.json
-eval_dir: ./e_dpo_Gemma-2-2b-it/Train1_Gemma-2-2b-it_iter1_reward.json
+train_dir: ./e_dpo_Gemma-2-2b-it/Train_Q1_Test_Gemma-2-2b-it_iter1_reward.json
+eval_dir: ./e_dpo_Gemma-2-2b-it/Train_Q1_Test_Gemma-2-2b-it_iter1_reward.json
 loss_type: sigmoid
 lr_scheduler_type: cosine
 max_length: 2048
 max_prompt_length: 1000
 eval_strategy: steps
 bf16: true
-per_device_train_batch_size: 2
+per_device_train_batch_size: 1
 per_device_eval_batch_size: 1
 gradient_accumulation_steps: 4
 label_smoothing: 0.1
