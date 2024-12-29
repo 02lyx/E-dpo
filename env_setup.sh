@@ -24,3 +24,4 @@ cd ..
 conda env create -f environment.yaml
 conda activate yy
 pip install flash-attn==2.6.3
+pip install transformers==4.46.3
