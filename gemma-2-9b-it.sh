@@ -20,7 +20,7 @@ run_iteration() {
     my_world_size=8
 
     conda activate yy
-    accelerate launch --num_processes ${my_world_size} xiaojun_E_step_ent_PPO_dp.py --model_name ${model_path} --critic_model_name ${model_path} --deepspeed deepspeed_configs/deepspeed_2.json --per_device_train_batch_size 2 --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
+    accelerate launch --main_process_port $PORT1 --num_processes ${my_world_size} xiaojun_E_step_ent_PPO_dp.py --model_name ${model_path} --critic_model_name ${model_path} --deepspeed deepspeed_configs/deepspeed_2.json --per_device_train_batch_size 2 --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
     wait
     conda activate gen-eval
     #bash generation/register_server.sh $model_path
@@ -73,7 +73,7 @@ gradient_accumulation_steps: 2
 label_smoothing: 0.1
 EOT
 
-    accelerate launch --config_file ./configs/zero3.yaml dpo_iteration/run_dpo.py dpo_config.yaml
+    accelerate launch --main_process_port $PORT1 --config_file ./configs/zero3.yaml dpo_iteration/run_dpo.py dpo_config.yaml
 }
 
 
