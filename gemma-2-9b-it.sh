@@ -86,11 +86,11 @@ do
     model_output="${base_path}/${iteration_prefix}${i}_${iteration_name}_reward.json"
     e_model_dir="${base_path}/e-model-iter-$i"
     if [ "$i" -eq 1 ]; then
-        split="[:5%]"
+        split="[:1%]"
     elif [ "$i" -eq 2 ]; then
-        split="[5%:10%]"
+        split="[5%:6%]"
     else
-        split="[15%:20%]"
+        split="[15%:16%]"
     fi
     # Determine the model path: first iteration uses the initial model, subsequent iterations use the previous iteration's model
     if [ $i -eq 1 ]; then
