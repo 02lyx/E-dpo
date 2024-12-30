@@ -432,12 +432,12 @@ def main(script_args):
     model.save_pretrained(final_dir, from_pt=True)
     tokenizer.save_pretrained(final_dir)
     #trainer.save_model(final_dir)
-    subprocess.run([
-        "huggingface-cli", "upload", 
-        f"YYT-t/{trained_model_name}_final_checkpoint", 
-        f"{output_name}/final_checkpoint", 
-        "--token", "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"
-    ])
+    # subprocess.run([
+    #     "huggingface-cli", "upload", 
+    #     f"YYT-t/{trained_model_name}_final_checkpoint", 
+    #     f"{output_name}/final_checkpoint", 
+    #     "--token", "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"
+    # ])
 
 if __name__ == '__main__':
     parser = HfArgumentParser(ScriptArguments)
