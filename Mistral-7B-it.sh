@@ -4,8 +4,8 @@ source ~/.bashrc
 eval "$(conda shell.bash hook)"
 
 # Base paths and settings
-initial_model="ZhangShenao/baseline-Llama-3-8B-Instruct-sft"
-base_path="./e_dpo_Llama-3-8b-it"
+initial_model="ZhangShenao/baseline-Mistral-7B-Instruct-v0.2-sft"
+base_path="./e_dpo_Mistral-7B-it"
 mkdir $base_path
 iteration_prefix="Train"
 task_pre="math"
@@ -80,7 +80,7 @@ EOT
 # Main loop for iterations
 for i in {1..3}
 do
-    iteration_name="Llama-3-8b-it_iter${i}"
+    iteration_name="Mistral-7B-it_iter${i}"
     jsonl_input="RLHF4MATH/prompt_iter${i}"
     json_output="${base_path}/${iteration_prefix}${i}_${iteration_name}"
     model_output="${base_path}/${iteration_prefix}${i}_${iteration_name}_reward.json"
@@ -97,7 +97,7 @@ do
         model_path=$initial_model
     else
         previous_iteration=$((i-1))
-        model_path="./Llama-3-8b-it_iter${previous_iteration}"
+        model_path="./Mistral-7B-it_iter${previous_iteration}"
     fi
 
     run_iteration $iteration_name $model_path $jsonl_input $json_output $model_output
