@@ -3,6 +3,12 @@ source ~/.bashrc
 # Initialize Conda environment
 eval "$(conda shell.bash hook)"
 
+export http_proxy=http://sys-proxy-rd-relay.byted.org:8118
+export https_proxy=http://sys-proxy-rd-relay.byted.org:8118
+export no_proxy=byted.org
+export HUGGINGFACE_TOKEN=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
+huggingface-cli login --quiet
+
 # Base paths and settings
 initial_model="ZhangShenao/baseline-gemma-1.1-7b-it-sft"
 base_path="./e_dpo_Gemma-1.1-7b-it"
