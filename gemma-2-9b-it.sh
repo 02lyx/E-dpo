@@ -20,7 +20,7 @@ run_iteration() {
     my_world_size=8
 
     conda activate yy
-    python xiaojun_E_step_ent_PPO.py --model_name ${model_path} --critic_model_name "google/gemma-2-2b-it" --per_device_train_batch_size 2 --gradient_accumulation_steps 4 --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1    wait
+    python xiaojun_E_step_ent_PPO.py --model_name ${model_path} --critic_model_name "google/gemma-2-2b-it" --per_device_train_batch_size 2 --gradient_accumulation_steps 4 --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
     wait
     conda activate gen-eval
     #bash generation/register_server.sh $model_path
