@@ -74,7 +74,7 @@ gradient_accumulation_steps: 2
 label_smoothing: 0.1
 EOT
 
-    accelerate launch --config_file ./configs/zero3.yaml dpo_iteration/run_dpo.py dpo_config.yaml
+    accelerate launch --main_process_port $PORT1 --config_file ./configs/zero3.yaml dpo_iteration/run_dpo.py dpo_config.yaml
 }
 
 
