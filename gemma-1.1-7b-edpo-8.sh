@@ -2,8 +2,8 @@ SAVE_DIR="/projects/p32646/new_model/"
 git clone https://github.com/02lyx/E-dpo.git
 cd E-dpo
 bash env_setup.sh
-source ~/.bashrc
 
+source ~/.bashrc
 # Initialize Conda environment
 eval "$(conda shell.bash hook)"
 huggingface-cli login --token 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
@@ -21,7 +21,7 @@ run_iteration() {
     local jsonl_input=$3
     local json_output=$4
     local model_output=$5
-    my_world_size=4
+    my_world_size=8
     conda activate yy
     python xiaojun_E_step_ent_PPO_yt.py --model_name ${model_path} --critic_model_name "google/gemma-2-2b-it" --learning_rate 4e-7 --per_device_train_batch_size 1 --gradient_accumulation_steps 8 --task_type "${task_pre}_${task_suf}${split}" --model_path $e_model_dir || exit 1
     wait
