@@ -116,11 +116,14 @@ ds = load_dataset(script_args.dataset_name_or_path)['train']
 #     return sample
 
 instruct_prompt = r"Please reason step by step, and put your final answer within \\boxed{{}}"
-example = r"Question: What is the sum of the following infinite geometric series: $\frac{1}{3} - \frac{1}{9} + \frac{1}{27} - \frac{1}{81} + \frac{1}{243} - \frac{1}{729} + \frac{1}{2187} - \cdots$? Answer: To find the sum of an infinite geometric series, we need to determine if the series converges or diverges. In this case, we have a common ratio of $-\frac{1}{3}$. The series will converge if the absolute value of the common ratio is less than 1, and it will diverge otherwise. In this case, since $\left| -\frac{1}{3} \right| = \frac{1}{3} < 1$, the series converges. Next, we can use the formula for the sum of an infinite geometric series to find its value. The formula is given by: $$ S = \frac{a}{1-r} $$ where $S$ is the sum of the series, $a$ is the first term, and $r$ is the common ratio. In this case, the first term $a$ is $\frac{1}{3}$ and the common ratio $r$ is $-\frac{1}{3}$. Plugging these values into the formula, we have: $$ S = \frac{\frac{1}{3}}{1 - \left(-\frac{1}{3}\right)} $$ Simplifying the denominator, we get: $$ S = \frac{\frac{1}{3}}{\frac{4}{3}} $$ Dividing the numerator and denominator, we obtain: $$ S = \frac{1}{4} $$ Therefore, the sum of the given infinite geometric series is $\boxed{\frac{1}{4}}$. The answer is: \frac{1}{4}"
-few_shot_cot_prompt = instruct_prompt + '\n' + example + f'\nQuestion: '  
+# example = r"Question: What is the sum of the following infinite geometric series: $\frac{1}{3} - \frac{1}{9} + \frac{1}{27} - \frac{1}{81} + \frac{1}{243} - \frac{1}{729} + \frac{1}{2187} - \cdots$? Answer: To find the sum of an infinite geometric series, we need to determine if the series converges or diverges. In this case, we have a common ratio of $-\frac{1}{3}$. The series will converge if the absolute value of the common ratio is less than 1, and it will diverge otherwise. In this case, since $\left| -\frac{1}{3} \right| = \frac{1}{3} < 1$, the series converges. Next, we can use the formula for the sum of an infinite geometric series to find its value. The formula is given by: $$ S = \frac{a}{1-r} $$ where $S$ is the sum of the series, $a$ is the first term, and $r$ is the common ratio. In this case, the first term $a$ is $\frac{1}{3}$ and the common ratio $r$ is $-\frac{1}{3}$. Plugging these values into the formula, we have: $$ S = \frac{\frac{1}{3}}{1 - \left(-\frac{1}{3}\right)} $$ Simplifying the denominator, we get: $$ S = \frac{\frac{1}{3}}{\frac{4}{3}} $$ Dividing the numerator and denominator, we obtain: $$ S = \frac{1}{4} $$ Therefore, the sum of the given infinite geometric series is $\boxed{\frac{1}{4}}$. The answer is: \frac{1}{4}"
+# few_shot_cot_prompt = instruct_prompt + '\n' + example + f'\nQuestion: '  
+few_shot_cot_prompt = f'Question: ' 
 
-def tokenize(sample):
+def preprocess(sample):
     sample["prompt"] = few_shot_cot_prompt + sample['question']
+    sample["prompt_with_ct"] = tokenizer.apply_chat_template([{"role": "user", "content": sample["prompt"]}], tokenize = False, add_generation_prompt= True)
+
     if sample['type'] in ['gsm8k']:
         answer_text = sample['solution'].split('####')[-1].strip()
     elif sample['type'] in ['gpt-3.5-turbo', 'math', 'MATH_Rephrased', 'MATH_FOBAR', 'MATH_SV', 'GSM_Rephrased', 'GSM_SV', 'GSM_FOBAR']:
@@ -136,7 +139,7 @@ def tokenize(sample):
 #     }
 # )
 
-ds = ds.map(tokenize, num_proc=16)
+ds = ds.map(preprocess, num_proc=16)
 
 data_size = len(ds)
 one_num_share = int(data_size / script_args.my_world_size)
@@ -147,7 +150,7 @@ print(ds, script_args.dataset_name_or_path)
 print(ds[0])
 
 
-prompts = [ds[i]["prompt"] for i in range(len(ds))]
+prompts = [ds[i]["prompt_with_ct"] for i in range(len(ds))]
 outputs = llm.generate(prompts, sampling_params=sampling_params, use_tqdm=True)
 
 
