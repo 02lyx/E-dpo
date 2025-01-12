@@ -36,10 +36,10 @@ run_iteration() {
     CUDA_VISIBLE_DEVICES=1 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 1 --my_world_size ${my_world_size} &
     CUDA_VISIBLE_DEVICES=2 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 2 --my_world_size ${my_world_size} &
     CUDA_VISIBLE_DEVICES=3 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 3 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=4 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 0 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=5 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 1 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=6 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 2 --my_world_size ${my_world_size} &
-    CUDA_VISIBLE_DEVICES=7 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 3 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=4 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 4 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=5 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 5 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=6 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 6 --my_world_size ${my_world_size} &
+    CUDA_VISIBLE_DEVICES=7 python ./generation/gen_hf2.py --model_name_or_path ${infer_model} --dataset_name_or_path ${prompt_dir} --output_dir ${output_dir} --K 30 --temperature 1.0 --local_index 7 --my_world_size ${my_world_size} &
     wait
     python ./generation/merge_data.py --base_path ${output_dir} --output_dir "${output_dir}_data.json" --num_datasets $my_world_size
     conda activate anno-train
