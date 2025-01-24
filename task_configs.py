@@ -120,6 +120,52 @@ class Config_Math_MetaMath(Config_Math):
             return sample
         return tokenize
 
+class Config_Math_Rlhf(Config_Math):
+    def __init__(self):
+        super(Config_Math_Rlhf, self).__init__()
+        self.x_colname = "query"
+        self.y_colname = "response"
+
+
+    def tokenize_E(self, tokenizer):
+        def tokenize(sample):
+            #tokenized_q = tokenizer(self.few_shot_cot_prompt + sample['query'], truncation=True)
+            input = [{"role": "user", "content": sample['query']}]
+            q = tokenizer.apply_chat_template(input, tokenize=False, add_generation_prompt=True)
+            tokenized_q = tokenizer(q, truncation=True)
+            answer_text = sample['response'].split('The answer is: ')[-1].strip()
+            answer = f"The answer is {answer_text}."
+            input_answer = [{"role": "user", "content": sample['query']}, {"role": "assistant", "content": answer}]
+            # print(tokenized_q, tokenizer.apply_chat_template(input_answer, tokenize=True))
+            answer = tokenizer.apply_chat_template(input_answer, tokenize=False).replace(q, '')
+            tokenized_a = tokenizer(answer, truncation=True)
+            sample["input_ids_q"] = tokenized_q["input_ids"]
+            sample["attention_mask_q"] = tokenized_q["attention_mask"]
+            sample["input_ids_a"] = tokenized_a["input_ids"]
+            sample["attention_mask_a"] = tokenized_a["attention_mask"]
+            return sample
+        return tokenize
+
+    def inference_tokenize(self, tokenizer):
+        def tokenize(sample):
+            input = [{"role": "user", "content": sample['query']}]
+            q = tokenizer.apply_chat_template(input, tokenize=False, add_generation_prompt=True)
+            answer_text = sample['response'].split("The answer is ")[-1].strip()
+            answer = f"The answer is {answer_text}."
+            input_answer = [{"role": "user", "content": sample['query']}, {"role": "assistant", "content": answer}]
+            answer = tokenizer.apply_chat_template(input_answer, tokenize=False).replace(q, '')
+            sample["template_question"] = q
+            sample["answer_text"] = answer
+            return sample
+        return tokenize
+    
+    def sft_tokenize(self, tokenizer):
+        def tokenize(sample):
+            input = [{"role": "user", "content": sample['question']}]
+            q = tokenizer.apply_chat_template(input, tokenize=False, add_generation_prompt=True)
+            sample["question"] = q
+            return sample
+        return tokenize
 
 class Config_Math_Math(Config_Math):
     def __init__(self):
@@ -282,6 +328,8 @@ def task_config_check(task_name):
         return Config_Math_MetaMath()
     elif task_name.startswith("math_math"):
         return Config_Math_Math()
+    elif task_name.startswith("math_rlhf"):  
+        return Config_Math_Rlhf()
     elif task_name == "code_opencoder_edu":
         return Config_Code_Opencoder_edu()
 
@@ -312,6 +360,9 @@ def task_data_set(task_name):
         train_set_path = "OpenCoder-LLM/opc-sft-stage2"
         return train_set_path, load_dataset(train_set_path, "educational_instruct")["train"]
     else:
-        train_set_path = "ZhangShenao/metamath_filtered" #"meta-math/MetaMathQA"
-        split = task_name.split("math_metamath")[-1]
+        # train_set_path = "ZhangShenao/metamath_filtered" #"meta-math/MetaMathQA"
+        # split = task_name.split("math_metamath")[-1]
+        # return train_set_path, load_dataset(train_set_path, split=f"train{split}")
+        train_set_path = "Yuanxin-Liu/E-RLHF" #"meta-math/MetaMathQA"
+        split = task_name.split("math_rlhf")[-1]
         return train_set_path, load_dataset(train_set_path, split=f"train{split}")
