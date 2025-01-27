@@ -280,9 +280,9 @@ def calc_PPO_loss(model, critic_model, seq, attention_mask, prompts, reward_scor
 def main(script_args):
     # get cuda_visible_devices
     cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES", "")
-    # print(f"cuda_visible_devices: {cuda_visible_devices}")
-    # cuda_visible_devices = cuda_visible_devices.split(",")
-    cuda_visible_devices = [0,1,2,3]
+    print(f"cuda_visible_devices: {cuda_visible_devices}")
+    cuda_visible_devices = cuda_visible_devices.split(",")
+    # cuda_visible_devices = [0,1,2,3]
     Devices = [f"cuda:{i}" for i in cuda_visible_devices]
     print(f"Devices: {Devices}")
 
